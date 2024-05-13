@@ -1,5 +1,6 @@
 
-5. O método de Jacobi é uma técnica representativa para solucionar sistemas de equações lineares (SEL). Um sistema de equações lineares possui o seguinte formato : Ax = b, no qual
+5. O método de Jacobi é uma técnica representativa para solucionar sistemas de equações lineares (SEL). 
+Um sistema de equações lineares possui o seguinte formato : Ax = b, no qual
 
 IMAGEM1
 
@@ -36,4 +37,11 @@ k=1
 x1(2)  =1/2 * (11 –1.1428)
 x2(2) = 1/7 * (13 – 5 * 5)
 …
-Nesta questão, o  objetivo  é quebrar a execução seqüencial em threads, na qual o valor de cada incógnita xi  pode ser calculado de forma concorrente em relação às demais incógnitas (Ex: x1(k+1) pode ser calculada ao mesmo tempo que x2(k+1)). A quantidade de threads a serem criadas vai depender de um parâmetro N passado pelo usuário durante a execução do programa, e N deverá ser equivalente à quantidade de processadores (ou núcleos) que a máquina possuir. No início do programa, as N threads deverão ser criadas, I incógnitas igualmente associadas para thread, e nenhuma thread poderá ser instanciada durante a execução do algoritmo. Dependendo do número N de threads, alguma thread poderá ficar com menos incógnitas assoicadas à ela.
+Nesta questão, o  objetivo  é quebrar a execução seqüencial em threads, na qual o valor de cada incógnita xi  pode ser calculado de forma concorrente em relação às demais incógnitas (Ex: x1(k+1) pode ser calculada ao mesmo tempo que x2(k+1)). 
+A quantidade de threads a serem criadas vai depender de um parâmetro N passado pelo usuário durante a execução do programa, e N deverá ser equivalente à quantidade de processadores (ou núcleos) que a máquina possuir. 
+No início do programa, as N threads deverão ser criadas, I incógnitas igualmente associadas para thread, e nenhuma thread poderá ser instanciada durante a execução do algoritmo. Dependendo do número N de threads, alguma thread poderá ficar com menos incógnitas assoicadas à ela.
+
+Para facilitar a construção do programa e a entrada de dados, as matrizes não precisam ser lidas do teclado, ou seja, podem ser inicializadas diretamente dentro do programa (ex: inicialização estática de vetores).  Ademais, os valores iniciais de xi(0) deverão ser iguais a 1, e adote mecanismo (ex: barriers) para sincronizar as threads depois de cada iteração.
+Faça a experimentação executando o programa em uma máquina com 4 processadores/núcleos,   demostrando a melhoria da execução do  programa com 1, 2 e 4 threads.
+ 
+ATENÇÃO: apesar de x1(k+1) pode ser calculada ao mesmo tempo que x2(k+1),, xi(k+2)  só poderão ser calculadas quando todas incógnitas xi(k+1) forem calculadas. Barriers são uma excelente ferramenta para essa questão.
