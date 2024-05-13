@@ -12,8 +12,9 @@ cria o nome do arquivo, que será identificado pelo seu ID, ex. "1.txt", "2.txt"
 lê cada palavra do arquivo e faz a comparação. Se for igual, da lock no mutex, e atualiza o contador, depois da unlock
 e continua o loop. Caso seja diferente, não faz nada.
 
-*não sei se precisa dar free nos ponteiros da main, acho que o pthread_exit já faz isso, porém eu dei close nos arquivos
-e dei free na verificação das alocações.
+dúvida: *não sei se precisa dar free nos ponteiros da main, acho que o pthread_exit já faz isso, porém eu dei close nos arquivos
+    e dei free na verificação das alocações.
+resp: rodei com o valgrind, e faltava dar free em alguns ponteiros, então dei free em threads e em taskids
 */
 
 #include <pthread.h>
@@ -66,6 +67,11 @@ int main(){
     }
 
     printf("A palavra apareceu %d vezes.\n", count);
+
+    free(threads);
+    for(int i = 0; i < x; i++)
+        free(taskids[i]);
+    free(taskids);
 
     pthread_exit(NULL);
 }
