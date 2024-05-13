@@ -1,0 +1,39 @@
+
+5. O método de Jacobi é uma técnica representativa para solucionar sistemas de equações lineares (SEL). Um sistema de equações lineares possui o seguinte formato : Ax = b, no qual
+
+IMAGEM1
+
+Ex:
+2x1 + x2 = 11
+5x1 + 7x2 =  13
+ 
+IMAGEM2
+	
+O método  método de Jacobi assume uma solução inicial para as incógnitas (xi)  e  o resultado é refinado durante P iterações , usando o algoritmo abaixo:
+
+while(k < P)
+begin
+
+IMAGEM3
+
+k = k + 1;
+end
+
+Por exemplo, assumindo o SEL apresentado anteriormente, P=10, e x1(0)=1 e x2(0)=1:
+while(k  < 10)
+begin
+x1(k+1)  =1/2 * (11 – x2(k))
+x2(k+1) = 1/7 * (13 – 5x1(k))
+          	k = k+1;
+end
+ 
+Exemplo de execução
+k=0
+x1(1)  =1/2 * (11 – x2(0)) = 1/2 *(11-1) =  5
+x2(1) = 1/7 * (13 – 5x1(0)) = 1/7 *(13-5 * 1) = 1.1428
+ 
+k=1
+x1(2)  =1/2 * (11 –1.1428)
+x2(2) = 1/7 * (13 – 5 * 5)
+…
+Nesta questão, o  objetivo  é quebrar a execução seqüencial em threads, na qual o valor de cada incógnita xi  pode ser calculado de forma concorrente em relação às demais incógnitas (Ex: x1(k+1) pode ser calculada ao mesmo tempo que x2(k+1)). A quantidade de threads a serem criadas vai depender de um parâmetro N passado pelo usuário durante a execução do programa, e N deverá ser equivalente à quantidade de processadores (ou núcleos) que a máquina possuir. No início do programa, as N threads deverão ser criadas, I incógnitas igualmente associadas para thread, e nenhuma thread poderá ser instanciada durante a execução do algoritmo. Dependendo do número N de threads, alguma thread poderá ficar com menos incógnitas assoicadas à ela.

@@ -1,0 +1,12 @@
+6. Uma versão brasileira do Linux pretende implementar um novo algoritmo de escalonamento para threads em CPUs multicore (múltiplos núcleos). Para isso, deve seguir os requisitos abaixo:
+
+Uma constante N que representa a quantidade de núcleos do sistema computacional. Consequentemente, N representará a quantidade máximas de threads em execução;
+
+ lista_pronto que representará uma fila das execuções pendentes das threads;
+
+Uma thread escalonador. Esta deverá pegar as threads da lista_pronto, e gerenciar a execução nos N núcleos. Assuma que o código das threads são representadas por uma função qualquer que termina (ex: não tem laço infinito). Se não houver thread para ser executada na lista_pronto, a thread escalonador dorme. Pelo menos uma thread na lista_pronto,  faz com que o escalonador acorde e coloque a nova thread  pra executar. Se por um acaso N threads estejam executando e existem threads na lista_pronto,, somente quando uma thread concluir a execução, uma nova thread será executada.  
+Atenção: a thread escalonador é interna do sistema operacional e escondida do usuário.
+
+A implementação não poderá ter espera ocupada. A estrutura e funcionamento ficarão a critério da equipe, desde que siga os requisitos acima. Por exemplo, pode-se criar uma função agendar para adicionar uma thread a lista_pronto e acordar o escalonador quando necessário.
+Você deverá utilizar variáveis de condição para evitar a espera ocupada. Lembre-se que essas variáveis precisam ser utilizadas em conjunto com mutexes. Mutexes deverão ser utilizados de forma refinada, no sentido que um recurso não deverá travar outro recurso independente.
+ 
