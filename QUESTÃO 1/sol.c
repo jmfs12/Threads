@@ -34,10 +34,8 @@ int main(){
     // leitura da palavra e do número de arquivos
     printf("Digite a palavra: ");
     scanf(" %s", word);
-    printf("\n");
-    printf("Digite o número de arquivos: ");
+    printf("\nDigite o número de arquivos: ");
     scanf("%d", &x);
-    printf("\n");
     // alocacao da quantidade de threads para ler os arquivos
     pthread_t *threads = (pthread_t *)malloc(x * sizeof(pthread_t));
     if(threads == NULL) { printf("Erro na alocacao1\n"); exit(1); };
@@ -66,7 +64,7 @@ int main(){
         pthread_join(threads[u], NULL);
     }
 
-    printf("A palavra apareceu %d vezes.\n", count);
+    printf("\nA palavra apareceu %d vezes.\n", count);
 
     free(threads);
     for(int i = 0; i < x; i++)
