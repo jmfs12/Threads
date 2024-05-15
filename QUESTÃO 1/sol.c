@@ -83,7 +83,8 @@ void *read(void *threadid){
     FILE *arq;
     char filename[20];
     sprintf(filename, "%d.txt", fileID);
- 
+    //fileID está sendo usado fora do mutex, isso possivelmente daria algum erro, acredito que o mutex unlock deveria estar após o sprintf:
+    //pthread_mutex_unlock(&mymutex);
     arq = fopen(filename, "r");
     if(arq == NULL) { printf("Falha ao abrir o arquivo"); exit(1); }
 
