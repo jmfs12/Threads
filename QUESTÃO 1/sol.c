@@ -78,13 +78,11 @@ void *read(void *threadid){
     // incremento do ID do arquivo, usando mutex, para que as threads acessem diferentes arquivos.
     pthread_mutex_lock(&mymutex); 
     fileID++; 
-    pthread_mutex_unlock(&mymutex);
     // ajuste do nome do arquivo
     FILE *arq;
     char filename[20];
     sprintf(filename, "%d.txt", fileID);
-    //fileID está sendo usado fora do mutex, isso possivelmente daria algum erro, acredito que o mutex unlock deveria estar após o sprintf:
-    //pthread_mutex_unlock(&mymutex);
+    pthread_mutex_unlock(&mymutex);
     arq = fopen(filename, "r");
     if(arq == NULL) { printf("Falha ao abrir o arquivo"); exit(1); }
 
