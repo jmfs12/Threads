@@ -49,11 +49,53 @@ int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
 
 int pthread_mutex_lock(pthread_mutex_t *mutex);
 -
+- A função tenta bloquear o mutex, caso o mesmo já esteja bloqueado o thread atual será bloqueado até que o mutex fique livre.
 
 int pthread_mutex_trylock(pthread_mutex_t *mutex);
 -
-
+- A função tenta bloquear e retorna 0 caso bem sucedido, caso contrário retornar um valor diferente de 0 e continua a execução do thread atual.
 
 int pthread_mutex_unlock(pthread_mutex_t *mutex);
 -
+- A função desbloqueia o mutex.
+
+Criação e destruição de variáveis de condição
+-
+
+Estática:
+pthread_cond_t mycv = PTHREAD_COND_INITIALIZER;
+
+Dinâmica:
+pthread_cond_t mycv;
+...
+pthread_cond_init(&mycv,NULL);
+
+Destruição:
+pthread_cond_destroy(&mycv)
+
+Usando variáveis de condião
+-
+- Esperar que certa condição torne-se verdadeira:
+- pthread_cond_wait(cond_var, mutex);
+- Avisar outra(s) thread(s) que a condição tornou-se verdadeira:
+-  pthread_cond_signal(cond_var);
+-  pthread_cond_broadcast(cond_var);
+-  Signal avisa a apenas uam thread, enquanto broadcast a todas vinculadas à condição.
+
+pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *restrict attr, unsigned count);
+-
+- Inicializa uma barreira, mecanismo de sincronia entre várias threads.
+- barrier -> Variável vinculada a barreira, deve ser inicializado com o tipo pthread_barrier_t.
+- attr ->
+- count ->
+- Retorna 0 caso sucesso, e um valor diferente caso apresente algum erro.
+
+int pthread_barrier_wait(pthread_barrier_t *barrier);
+-
+-
+
+pthread_barrier_destroy(pthread_barrier_t *barrier_alvo);
+-
+- Destrói a barrier_alvo
+
 
