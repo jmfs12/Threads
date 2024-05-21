@@ -32,7 +32,7 @@ int main(){
     if(taskids == NULL) { printf("Erro na alocacao2\n"); free(threads); exit(1); };
     pthread_t lastThread;
 
-    pthread_barrier_init(&barrier, NULL, n);
+    pthread_barrier_init(&barrier, NULL, n+1);
 
     for(int i = 0; i < n; i++){
         taskids[i] = (int *)malloc(sizeof(int));
