@@ -13,15 +13,15 @@ void merge(void *threadid);
 
 int main(){
     int N, len;
-    printf("Insira a quantidade de partes: ");
+    printf("Insira a quantidade de partes para dividir o array: ");
     scanf("%d", &N);
-    printf("\nInsira o tamanho do array: ");
-    scanf("%d", &len);
-    printf("\nInsira os elementos do array: ");
-    *arr = (int *)malloc(len * sizeof(int));
-    if(arr = NULL) { exit(1); } 
-    for(int i = 0; i < len; i++){
-        scanf("%d", &arr[i]);
+    printf("\nIndique o tamanho do array para ser gerado de forma aleatória: ");
+    scanf("%d",&len);
+    *arr = (int*)malloc(len*sizeof(int);
+    printf("\nO array gerado, em ordem é: "\n);
+    for (int i = 0; i < len; i++) {
+        arr[i] = rand() % 100;
+        printf("%d ",array[i]);
     }
 
     int n = len/N;
