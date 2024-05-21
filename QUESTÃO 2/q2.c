@@ -59,9 +59,8 @@ int main(){
 }
 
 void *bubblesort(void *threadid){
-    pthread_t id = pthread_self();
-    for(int i = (int)id*n; i < ((int)id+1)*n; i++){
-        for(int j = (int)id*n; j < (((int)id+1)*n)-1-(i-(int)id*n);j++){
+    for(int i = (int)threadid*n; i < ((int)threadid+1)*n; i++){
+        for(int j = (int)threadid*n; j < (((int)threadid+1)*n)-1-(i-(int)threadid*n);j++){
             if(arr[j] > arr[j+1]){
                 int tmp = arr[j];
                 arr[j] = arr[j+1];
