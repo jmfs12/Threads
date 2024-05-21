@@ -11,7 +11,7 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_
 
 void pthread_exit(void *value_ptr);
 -
-The pthread_exit() function shall terminate the calling thread and make the value value_ptr available to any successful join with the terminating thread.
+- The pthread_exit() function shall terminate the calling thread and make the value value_ptr available to any successful join with the terminating thread.
 Obs.: Para value_ptr=NULL, a função aguarda todas as threads terminarem, caso seja um valor diferente de NULL a mesma elimina todas as threads.
 
 int pthread_join(pthread_t thread_alvo, void **value_ptr);
