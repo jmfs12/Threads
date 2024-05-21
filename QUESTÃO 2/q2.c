@@ -51,7 +51,7 @@ int main(){
     }
     pthread_barrier_wait(&barrier);
 
-    pthread_join(threads[n], NULL);
+    pthread_join(lastThread, NULL);
 
     pthread_barrier_destroy(&barrier);
     
