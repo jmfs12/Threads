@@ -12,9 +12,6 @@ cria o nome do arquivo, que será identificado pelo seu ID, ex. "1.txt", "2.txt"
 lê cada palavra do arquivo e faz a comparação. Se for igual, da lock no mutex, e atualiza o contador, depois da unlock
 e continua o loop. Caso seja diferente, não faz nada.
 
-dúvida: *não sei se precisa dar free nos ponteiros da main, acho que o pthread_exit já faz isso, porém eu dei close nos arquivos
-    e dei free na verificação das alocações.
-resp: rodei com o valgrind, e faltava dar free em alguns ponteiros, então dei free em threads e em taskids
 */
 
 #include <pthread.h>
@@ -75,14 +72,15 @@ int main(){
 }
 
 void *read(void *threadid){
+    FILE *arq;
+    char filename[20];
     // incremento do ID do arquivo, usando mutex, para que as threads acessem diferentes arquivos.
     pthread_mutex_lock(&mymutex); 
     fileID++; 
     // ajuste do nome do arquivo
-    FILE *arq;
-    char filename[20];
     sprintf(filename, "%d.txt", fileID);
     pthread_mutex_unlock(&mymutex);
+    
     arq = fopen(filename, "r");
     if(arq == NULL) { printf("Falha ao abrir o arquivo"); exit(1); }
 
