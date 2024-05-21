@@ -86,13 +86,13 @@ pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *re
 -
 - Inicializa uma barreira, mecanismo de sincronia entre várias threads.
 - barrier -> Variável vinculada a barreira, deve ser inicializado com o tipo pthread_barrier_t.
-- attr ->
-- count ->
+- attr -> Atributos, se NULL faz os atríbutos padrão.
+- count -> Quantia de threads necessária para atingir o alvo.
 - Retorna 0 caso sucesso, e um valor diferente caso apresente algum erro.
 
 int pthread_barrier_wait(pthread_barrier_t *barrier);
 -
--
+- Aguarda a quantia count de threads chegarem nesse wait, quando chegar libera todos os threads.
 
 pthread_barrier_destroy(pthread_barrier_t *barrier_alvo);
 -
