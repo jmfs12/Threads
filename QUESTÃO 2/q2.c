@@ -39,11 +39,10 @@ int main(){
         if(taskids[i] == NULL) { printf("Erro na alocacao3"); free(threads); free(taskids); exit(1); }
         *taskids[i] = i;
         pthread_create(&threads[i], NULL, bubblesort, (void *) taskids[i]);
+
     }
     taskids[n] = (int *)malloc(sizeof(int));
     *taskids[n] = n;
-
-    pthread_create(&lastThread, NULL, merge, (void *)taskids[n]);
 
 
     for(int i = 0; i < n; i++){
@@ -51,6 +50,7 @@ int main(){
     }
     pthread_barrier_wait(&barrier);
 
+    pthread_create(&lastThread, NULL, merge, (void *)taskids[n]);
     pthread_join(lastThread, NULL);
 
     pthread_barrier_destroy(&barrier);
