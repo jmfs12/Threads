@@ -21,3 +21,39 @@ int pthread_join(pthread_t thread_alvo, void **value_ptr);
 
 pthread_t pthread_self(void);
 -
+- The pthread_self() function shall return the thread ID of the calling thread.
+
+int pthread_equal(pthread_t t1, pthread_t t2);
+-
+- pthread_equal() devolve 0 se as threads forem diferentes e um número maior que zero caso contrário. 
+
+Criação de mutexes:
+-
+Estática:
+pthread_mutex_t mymutex = PTHREAD_MUTEX_INITIALIZER;
+
+Dinâmica:
+pthread_mutex_t mymutex;
+...
+pthread_mutex_init(&mymutex,NULL);
+
+int pthread_mutex_destroy(pthread_mutex_t *mutex_alvo);
+-
+- Destruição do mutex_alvo.
+
+int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+-
+- Criação do mutex, mutex deve ser inicializado com o tipo pthread_mutex_t.
+- attr são os atríbutos, utilize NULL para inicializar com o padrão.
+- Se bem sucedida, as funções pthread_mutex_init() e pthread_mutex_destroy() retornarão zero, caso contrário retornarão um código de erro;
+
+int pthread_mutex_lock(pthread_mutex_t *mutex);
+-
+
+int pthread_mutex_trylock(pthread_mutex_t *mutex);
+-
+
+
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
+-
+
