@@ -11,36 +11,52 @@ typedef struct operation{
 
 }Operation;
 
-Queue create_queue(){
-    Queue q;
-    q.front = q.rear = (Link *)malloc(sizeof(Link));
-    q.front->next = q.rear->next = NULL;
-    q.size = 0;
-    return q;
+typedef struct node{
+    Operation* element;
+    struct node* next;
+} Node;
+
+typedef struct queue{
+    int size;
+    Node* front;
+    Node* rear;
+} Queue;
+
+int main(){
+
 }
 
-void enqueue(Queue *q, int item){
-    q->rear->next = create_link(item, NULL);
-    q->rear = q->rear->next;
+Node* create_elink(Node *nextval){
+    Node* n = (Node*) malloc(sizeof(Node));
+    n->next=nextval;
+    return n;
+}
+
+Node* create_link(Operation it, Node *nextval){
+    Node* n = (Node*) malloc(sizeof(Node));
+    n->element = it;
+    n->next = nextval;
+    return n;
+}
+
+Queue* create_queue(){
+    Queue* q = (Queue*) malloc(sizeof(Queue));
+    q->front=q->rear=create_elink(NULL);
+    q->size=0;
+    return q;
+}
+void enqueue(Queue* q, Operation it){
+    q->rear->next=create_link(it,NULL);
+    q->rear=q->rear->next;
     q->size++;
 }
-int dequeue(Queue *q){
-    if(q->size == 0)
-        return -1;
+Operation* dequeue(Queue* q){
+    if(q->size==0) return 0;
     else{
-        int item = q->front->next->element;
-        q->front->next = q->front->next->next;
-        if(q->front->next == NULL)
-            q->rear = q->front;
+        Operation* it=q->front->next->element;
+        q->front->next=q->front->next->next;
+        if(q->front->next==NULL) q->rear=q->front;
         q->size--;
-        return item;
+        return it;
     }
-}
-int frontValue(Queue q){
-    if(q.front != NULL)
-        return q.front->element;
-}
-int length(Queue q){
-    if(q.size > 0)
-        return q.size;
 }
