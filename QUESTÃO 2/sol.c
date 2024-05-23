@@ -91,6 +91,8 @@ int main (int argc, char *argv[]){
         exit(1);
       }
     }
+    printf("\n");
+
 
     pthread_barrier_wait(&barrier); // quanto todos chegarem, incluindo a main, todos passam
 
