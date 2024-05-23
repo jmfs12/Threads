@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #define BUFFER_SIZE 100 //definindo um buffer máximo de 100
+#define TABLE_SIZE 100
 
 Node* create_elink(Node *nextval);
 Node* create_link(Operation it, Node *nextval);
@@ -28,6 +29,10 @@ typedef struct queue{
     Node* front;
     Node* rear;
 } Queue;
+
+typedef struct {
+    Node *table[TABLE_SIZE];
+} HashTable;
 
     Queue* buffer;          //buffer do cliente para o banco
     Queue* buffer_output;   //buffer da respsota do banco para o cliente
@@ -144,18 +149,19 @@ void fclientes(int taskid){   //agindo como produtor
 
 void fbanco(){  //agindo como consumidor
     Operation processa;
+    while(1){
+        pthread_mutex_lock(&mutex);
+        while(buffer->size==0){
+            pthread_cond_wait(&fill,&mutex);
+        }
+        processa = dequeue(buffer);
+        //falta a implementação de hash, procurar a conta e retornar a solicitação processada
 
-    pthread_mutex_lock(&mutex);
-    while(buffer->size==0){
-        pthread_cond_wait(&fill,&mutex);
+        if(buffer->size==BUFFER_SIZE-1) pthread_cond_signal(&empty); //Avisando a algum cliente que tem espaço no servidor
+        enqueue(buffer_output,processa);
+        pthread_mutex_unlock(&resposta[processa.threadID]); //Desbloqueando o processo, para realizar a coleta da respsota no buffer de saida
+        pthread_mutex_unlock(&mutex);
     }
-    processa = dequeue(buffer);
-    //falta a implementação de hash, procurar a conta e retornar a solicitação processada
-
-    if(buffer->size==BUFFER_SIZE-1) pthread_cond_signal(&empty); //Avisando a algum cliente que tem espaço no servidor
-    enqueue(buffer_output,processa);
-    pthread_mutex_unlock(&resposta[processa.threadID]); //Desbloqueando o processo, para realizar a coleta da respsota no buffer de saida
-    pthread_mutex_unlock(&mutex);
 }
 
 
@@ -184,13 +190,56 @@ void enqueue(Queue* q, Operation it){
     q->rear=q->rear->next;
     q->size++;
 }
-Operation dequeue(Queue* q){
-    if(q->size==0) return NULL;
-    else{
-        Operation it=q->front->next->element;
-        q->front->next=q->front->next->next;
-        if(q->front->next==NULL) q->rear=q->front;
+Operation* dequeue(Queue* q) {
+    if (q->size == 0) 
+        return NULL;
+    else {
+        Operation *it = &(q->front->next->element);
+        Node *temp = q->front->next;
+        q->front->next = q->front->next->next;
+        free(temp);
+        if (q->front->next == NULL) 
+            q->rear = q->front;
         q->size--;
         return it;
     }
+}
+
+
+// Função de hash simples
+int hash(int key) {
+    return key % TABLE_SIZE;
+}
+
+// Função para inicializar a tabela de hash
+void initHashTable(HashTable *hashTable) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hashTable->table[i] = NULL;
+    }
+}
+
+// Função para inserir uma operação na tabela de hash
+void insert(HashTable *hashTable, Operation operation) {
+    int index = hash(operation.conta);
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        fprintf(stderr, "Erro ao alocar memória\n");
+        exit(1);
+    }
+    newNode->element = operation;
+    newNode->next = hashTable->table[index];
+    hashTable->table[index] = newNode;
+}
+
+// Função para procurar uma operação na tabela de hash
+Operation *search(HashTable *hashTable, int conta) {
+    int index = hash(conta);
+    Node *current = hashTable->table[index];
+    while (current != NULL) {
+        if (current->element.conta == conta) {
+            return &current->element;
+        }
+        current = current->next;
+    }
+    return NULL; // Se não encontrado
 }
