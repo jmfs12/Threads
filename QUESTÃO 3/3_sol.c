@@ -139,11 +139,23 @@ void fclientes(int taskid){   //agindo como produtor
         }else printf("Opção inválida, tente novamente.\n");
     }
 
+    pthread_exit(NULL);
 }
 
 void fbanco(){  //agindo como consumidor
+    Operation processa;
 
-    
+    pthread_mutex_lock(&mutex);
+    while(buffer->size==0){
+        pthread_cond_wait(&fill,&mutex);
+    }
+    processa = dequeue(buffer);
+    //falta a implementação de hash, procurar a conta e retornar a solicitação processada
+
+    if(buffer->size==BUFFER_SIZE-1) pthread_cond_signal(&empty); //Avisando a algum cliente que tem espaço no servidor
+    enqueue(buffer_output,processa);
+    pthread_mutex_unlock(&resposta[processa.threadID]); //Desbloqueando o processo, para realizar a coleta da respsota no buffer de saida
+    pthread_mutex_unlock(&mutex);
 }
 
 
