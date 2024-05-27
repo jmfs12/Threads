@@ -195,7 +195,7 @@ void *fclientes(void *tID){   //agindo como produtor
     pthread_exit(NULL);
 }
 
-void *fbanco(){  //agindo como consumidor
+void* fbanco(){  //agindo como consumidor
     HashTable** contas = create_hash();
     Operation* processa = (Operation*)malloc(sizeof(Operation));
     while(1){
@@ -277,9 +277,10 @@ int main(){
         rc = pthread_mutex_init(&resposta[i],NULL);
         if(rc) {printf("Erro na alocacao do mutex 1.");exit(3);};
     }
-    rc = pthread_create(&banco,NULL,fbanco,NULL);
+    rc = pthread_create(banco,NULL,fbanco,NULL);
     if(rc) {printf("Erro na alocação do thread 2.");exit(3);}
 
     for(int i=0;i<N;i++) pthread_join(clientes[i], NULL);   // aguardando os clientes fecharem para fechar a main
     pthread_exit(NULL);
+    return 10;
 }
