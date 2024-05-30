@@ -74,7 +74,6 @@ int main() {
 
     // preencher a matriz com uma solução de Sudoku para teste
     // é p substituir essa matriz por uma matriz de Sudoku para teste
-    // ver se vai dar certo desse jeito
     int sudoku[SIZE][SIZE] = {
         {5, 3, 4, 6, 7, 8, 9, 1, 2},
         {6, 7, 2, 1, 9, 5, 3, 4, 8},
