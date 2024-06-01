@@ -146,8 +146,12 @@ Operation* put_wait(Operation op,int threadid){
     //entregamos a solicitacao no buffer para o banco, agora temos que aguardar a resposta
     //Não podemos compartilhar o mutex entre os clientes, já que bloquearia todos ao mesmo tempo
     //logo, vamos ter que utilizar um mutex unico para cada cliente para que ele aguarde a respsota do banco
-    //o unlock é feito pelo banco.
+    //o banco avisa quando a condição está ok pra prosseguir
     pthread_mutex_lock(&resposta[threadid]);
+    while(buffer_output->size==0){
+        pthread_cond_wait(&cnd_resposta[threadid],&resposta[threadid]);
+    } 
+    pthread_mutex_unlock(&resposta[threadid]);
     return dequeue(buffer_output);
 }
 
@@ -236,7 +240,7 @@ void* fbanco(){  //agindo como consumidor
         pthread_mutex_lock(&mutex); //retorno da regiao critica
         if(buffer->size==BUFFER_SIZE-1) pthread_cond_signal(&empty); //Avisando a algum cliente que tem espaço no servidor
         enqueue(buffer_output,*processa);
-        pthread_mutex_unlock(&resposta[processa->threadID]); //Desbloqueando o processo, para realizar a coleta da respsota no buffer de saida
+        pthread_cond_signal(&cnd_resposta[processa->threadID]); //Desbloqueando o processo, para realizar a coleta da respsota no buffer de saida
         pthread_mutex_unlock(&mutex);
     }
     pthread_exit(NULL);
