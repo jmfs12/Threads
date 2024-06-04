@@ -57,12 +57,15 @@ void enqueue(Queue* q, Operation it){
     q->rear=q->rear->next;
     q->size++;
 }
-Operation* dequeue(Queue* q) {
-    if (q->size == 0) 
-        return NULL;
-    else {
-        Operation *it = &(q->front->next->element);
-        Node *temp = q->front->next;
+
+
+Operation dequeue(Queue* q) {
+    if (q->size == 0) {
+        Operation empty_op = { .operacao = -1 }; // Cria uma estrutura com operacao = -1
+        return empty_op;
+    } else {
+        Operation it = q->front->next->element; // Faz uma cópia dos dados
+        Node* temp = q->front->next;
         q->front->next = q->front->next->next;
         free(temp);
         if (q->front->next == NULL) 
@@ -71,6 +74,7 @@ Operation* dequeue(Queue* q) {
         return it;
     }
 }
+
 
 // Estrutura para armazenar os elementos do dicionário (tabela hash)
 typedef struct DictionaryEntry {
@@ -129,7 +133,7 @@ Operation* findhash(HashTable* table[], int key) {
     return NULL;    //retorna NULL se não encontrar nada
 }
 
-Operation* put_wait(Operation op,int threadid){
+Operation put_wait(Operation op,int threadid){
     //para inserir no buffer, bloqueamos que os demais consumidores façam o mesmo para evitar problemas
     pthread_mutex_lock(&mutex);
     if(buffer->size==BUFFER_SIZE){
@@ -145,7 +149,7 @@ Operation* put_wait(Operation op,int threadid){
     pthread_mutex_unlock(&mutex);
     //entregamos a solicitacao no buffer para o banco, agora temos que aguardar a resposta
     //Não podemos compartilhar o mutex entre os clientes, já que bloquearia todos ao mesmo tempo
-    //logo, vamos ter que utilizar um mutex unico para cada cliente para que ele aguarde a respsota do banco
+    //logo, vamos ter que utilizar um mutex unico com uma cnd para cada cliente para que ele aguarde a respsota do banco
     //o banco avisa quando a condição está ok pra prosseguir
     pthread_mutex_lock(&resposta[threadid]);
     while(buffer_output->size==0){
@@ -162,33 +166,34 @@ void *fclientes(void *tID){   //agindo como produtor
         printf("Olá cliente %d, informe sua conta: ",taskid);
         scanf("%d",&conta);
     while(op!=4){
+        printf("=======================================================================================\n");
         printf("(Cliente %d) Digite a operação que deseja realizar na conta %d \n",taskid,conta);
         printf("1. Saldo da conta\n2.Deposito\n3.Saque\n4. Sair\n");
         scanf("%d",&op);
         Operation escolha;
-        Operation* answ = (Operation*) malloc(sizeof(Operation));
+        Operation answ;
         escolha.conta=conta;
         escolha.operacao=op;
         escolha.threadID=taskid;    //Estamos identificando o thread que solicitou a operação, para que o banco o acorde quando devolver o solicitação
         if(op==1){
             answ = put_wait(escolha,taskid);
-            printf("O saldo da conta %d é de: %f \n",answ->conta,answ->saldo);
+            printf("O saldo da conta %d é de: %.2f \n",answ.conta,answ.saldo);
         }else if(op==2){
             printf("Digite o valor para deposito: ");
             scanf("%f",&valor);
             escolha.saldo=valor;
             answ = put_wait(escolha,taskid);
-            printf("Deposito realizado com sucesso, o novo saldo da conta %d é de: %f\n",answ->conta,answ->saldo);
+            printf("Deposito realizado com sucesso, o novo saldo da conta %d é de: %.2f\n",answ.conta,answ.saldo);
         }else if(op==3){
             printf("Digite o valor para saque: ");
             scanf("%f",&valor);
             escolha.saldo=valor;
             answ = put_wait(escolha,taskid);
-            if(answ->operacao==-1){  //Se o banco retornou com uma operacao -1, significa que nao ha saldo suficiente
+            if(answ.operacao==-1){  //Se o banco retornou com uma operacao -1, significa que nao ha saldo suficiente
                 printf("O saldo da conta é insuficiente para realizar o saque solicitado.\n");
-                printf("O saldo é de: %f\n",answ->saldo);
+                printf("O saldo é de: %.2f\n",answ.saldo);
             }else{
-                printf("Saque realizado com sucesso, o novo saldo é de: %f\n",answ->saldo);
+                printf("Saque realizado com sucesso, o novo saldo é de: %.2f\n",answ.saldo);
             }
         }else if(op==4){
             printf("Encerrando a sessão.\n");
@@ -201,7 +206,7 @@ void *fclientes(void *tID){   //agindo como produtor
 
 void* fbanco(){  //agindo como consumidor
     HashTable** contas = create_hash();
-    Operation* processa = (Operation*)malloc(sizeof(Operation));
+    Operation processa;
     while(1){
         pthread_mutex_lock(&mutex);
         while(buffer->size==0){
@@ -210,37 +215,37 @@ void* fbanco(){  //agindo como consumidor
         //falta a implementação de hash, procurar a conta e retornar a solicitação processada
         processa = dequeue(buffer);
         pthread_mutex_unlock(&mutex);   //regiao critica apenas quando altera o buffer
-        Operation *solicita = findhash(contas,processa->conta);  //Associando solicita ao endereço de memória direto da conta
+        Operation *solicita = findhash(contas,processa.conta);  //Associando solicita ao endereço de memória direto da conta
         if(solicita==NULL){ //alterar a criação, após associar diretamente ao endereço de memória gerou um erro
             //Conta não está criada, vamos criar agora.
             solicita = (Operation*) malloc(sizeof(Operation));
-            solicita->conta = processa->conta;
+            solicita->conta = processa.conta;
             solicita->operacao=0;
             solicita->saldo=0;
             inserth(contas,*solicita);
             free(solicita);
-            solicita = findhash(contas,processa->conta);  //coletando o ponteiro novamente
+            solicita = findhash(contas,processa.conta);  //coletando o ponteiro novamente
         } 
         //Agora temos solicita como os dados da conta e processa como o pedido do cliente
-        if(processa->operacao==1){//quer ver o saldo
-            processa->saldo=solicita->saldo;
-        }else if(processa->operacao==2){//quer fazer um deposito
-            solicita->saldo+=processa->saldo;
-            processa->saldo=solicita->saldo;    //estamos retornando o novo saldo
-        }else if(processa->operacao==3){//quer fazer um saque
-            if(solicita->saldo<processa->saldo){//se a conta não tiver saldo para sacar
-                processa->operacao=-1;              //informando a falta de saldo
-                processa->saldo=solicita->saldo;    //informando o saldo disponível na conta
+        if(processa.operacao==1){//quer ver o saldo
+            processa.saldo=solicita->saldo;
+        }else if(processa.operacao==2){//quer fazer um deposito
+            solicita->saldo+=processa.saldo;
+            processa.saldo=solicita->saldo;    //estamos retornando o novo saldo
+        }else if(processa.operacao==3){//quer fazer um saque
+            if(solicita->saldo<processa.saldo){//se a conta não tiver saldo para sacar
+                processa.operacao=-1;              //informando a falta de saldo
+                processa.saldo=solicita->saldo;    //informando o saldo disponível na conta
             }else{                                  //se a conta tiver saldo para sacar
-                solicita->saldo-=processa->saldo;   //removendo o saldo da conta
-                processa->saldo= solicita->saldo;   //retornando o novo saldo da conta.
+                solicita->saldo-=processa.saldo;   //removendo o saldo da conta
+                processa.saldo= solicita->saldo;   //retornando o novo saldo da conta.
             }
         }
 
         pthread_mutex_lock(&mutex); //retorno da regiao critica
         if(buffer->size==BUFFER_SIZE-1) pthread_cond_signal(&empty); //Avisando a algum cliente que tem espaço no servidor
-        enqueue(buffer_output,*processa);
-        pthread_cond_signal(&cnd_resposta[processa->threadID]); //Desbloqueando o processo, para realizar a coleta da respsota no buffer de saida
+        enqueue(buffer_output,processa);
+        pthread_cond_signal(&cnd_resposta[processa.threadID]); //Desbloqueando o processo, para realizar a coleta da respsota no buffer de saida
         pthread_mutex_unlock(&mutex);
     }
     pthread_exit(NULL);
@@ -254,7 +259,8 @@ int main(){
     buffer = create_queue();
     buffer_output = create_queue();
 
-    printf("Digite a quantidade de clientes: ");
+    printf("Digite a quantidade de clientes:\n");
+    printf("É recomendado que para teste seja apenas 1. Já que o código não foi feito com mutex na input.\nOu seja nao garante que o valor inserido será de fato para a variavel que está solicitando no momento.\n");
     scanf("%u",&N);
     //Alocação comum da thread
     pthread_t* clientes = (pthread_t*) malloc(N*sizeof(pthread_t));
