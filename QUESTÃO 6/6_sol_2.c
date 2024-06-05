@@ -40,6 +40,7 @@ pthread_cond_t empty = PTHREAD_COND_INITIALIZER;
 pthread_cond_t fill = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t buf = PTHREAD_MUTEX_INITIALIZER;
 pthread_t *threads;
+pthread_t Tcriador;
 int *ready;
 int count=0;
 int len;
@@ -57,20 +58,19 @@ void *thread_func(void *threadid){
     int random_microseconds = rand() % 1000000;
     usleep(random_microseconds);        //Aguardando um tempo aleatorio entre 0 e 1 segundo
 
-    //pthread_mutex_lock(&mutex[tid]);
-    //ready[tid] = 0;
-    //pthread_mutex_unlock(&mutex[tid]);
-    //pthread_cond_signal(&cond[tid]);
     count--;
+    
+    printf("Thread %d finalizada em %d ms\n", tid,random_microseconds);// Provavelmente o printf não aparece em ordem já que se trata de system calls
+    // e o SO demoraria bem mais para fazer esse comando do que os demais.
     pthread_mutex_lock(&mutexEsc);  //informando ao escalonador que liberou um núcleo
     pthread_cond_signal(&condEsc);
     pthread_mutex_unlock(&mutexEsc);
-    printf("Thread %d finalizada em %d ms\n", tid,random_microseconds);
     pthread_exit(NULL);
 }
 
 void *escalonador(void *ar){    //consome da fila e executa as threads
-
+    pthread_join(Tcriador,NULL); //Evitando condição de corrida entre o criador
+    //sem o join é possível que o escalonador tente escalonar algo que não existe.
     int i = 0;
     while(1){
         pthread_mutex_lock(&buf);
@@ -117,6 +117,7 @@ for(int i = 0; i < len; i++){       //A main vai estar agindo como produtor
         pthread_mutex_unlock(&buf);
         ready[i] = 0;
     }
+    pthread_exit(NULL);
 }
 
 
@@ -125,8 +126,7 @@ int main(){
     //criação da fila
     lista_pronto = create_queue();
     pthread_t Tescalonador;
-    pthread_t Tcriador;
-
+    //alocação e criação
     printf("Digite o número de núcleos: ");
     scanf("%d", &N);
     printf("\n");
@@ -138,9 +138,8 @@ int main(){
     mutex = (pthread_mutex_t *)malloc(len*sizeof(pthread_mutex_t));
     cond = (pthread_cond_t *)malloc(len*sizeof(pthread_cond_t));
     ready = (int *)malloc(len*sizeof(int));
-
-    pthread_create(&Tescalonador, NULL, escalonador, NULL);
     pthread_create(&Tcriador, NULL, criador, NULL);
+    pthread_create(&Tescalonador, NULL, escalonador, NULL); 
 
 
     for(int i=0;i<len;i++){
