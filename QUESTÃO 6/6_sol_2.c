@@ -105,6 +105,8 @@ void* criador(){
 for(int i = 0; i < len; i++){       //A main vai estar agindo como produtor
         taskids[i] = (int *)malloc(sizeof(int));
         *taskids[i] = i;
+        pthread_mutex_init(&mutex[i], NULL);
+        pthread_cond_init(&cond[i], NULL);
         pthread_create(&threads[i], NULL, thread_func, (void *) taskids[i]);
         pthread_mutex_lock(&buf);
         while(lista_pronto->size==BUFFER_SIZE){
@@ -113,8 +115,6 @@ for(int i = 0; i < len; i++){       //A main vai estar agindo como produtor
         enqueue(lista_pronto, threads[i], i);
         if(lista_pronto->size==1)   pthread_cond_signal(&fill);
         pthread_mutex_unlock(&buf);
-        pthread_mutex_init(&mutex[i], NULL);
-        pthread_cond_init(&cond[i], NULL);
         ready[i] = 0;
     }
 }
