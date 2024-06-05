@@ -128,8 +128,9 @@ int main(){
     pthread_cond_signal(&condEsc);
     pthread_mutex_unlock(&mutexEsc);
     
+    pthread_join(Tescalonador, NULL);
 
-    return 0;
+    pthread_exit(NULL);
 }
 
 Node* create_elink(Node *nextval){
