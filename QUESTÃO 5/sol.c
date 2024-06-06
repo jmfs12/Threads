@@ -1,3 +1,8 @@
+//TEMPO DE EXECUÇÃO DO CÓDIGO ABAIXO 
+// 1 THREAD  - 1,110s 
+// 2 THREADS - 0,917s 
+// 4 THREADS - 0,585s
+
 #define _XOPEN_SOURCE 600
 #include <pthread.h>
 #include <stdio.h>
