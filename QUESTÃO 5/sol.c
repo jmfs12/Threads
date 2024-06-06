@@ -4,11 +4,11 @@
 #include <stdlib.h>
 
 #define P 10 // Quantas interações serão feitas
-#define incognitas 3 // Número de incógnitas
+#define incognitas 2 // Número de incógnitas
 
-double A[incognitas][incognitas] = {{2, 1, 3}, {5, 7, 8}, {10, 4, 2}}; // Valores
-double b[incognitas] = {11, 13, 15}; // Valores de B
-double X[incognitas] = {1, 1, 1}; // Inicial (x^0)
+double A[incognitas][incognitas] = {{2, 1}, {5, 7}}; // Valores
+double b[incognitas] = {11, 13}; // Valores de B
+double X[incognitas] = {1, 1}; // Inicial (x^0)
 double Xtemp[incognitas]; // Valor temporário após cada somatório
 double Xfinal[P][incognitas]; // Vai guardar cada interação
 int N; // Threads definidas na main
