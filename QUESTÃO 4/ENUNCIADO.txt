@@ -1,1 +1,0 @@
-4. O sudoku é jogado em um tabuleiro de 9x9, dividido em nove subgrades de 3x3. O objetivo é preencher o tabuleiro de modo que cada linha, cada coluna e cada subgrade contenha todos os números de 1 a 9 sem repetições. Faça um programa usando pthreads que recebe uma matriz 9x9 e confere, usando múltiplas threads,  se é uma solução válida de sudoku.
