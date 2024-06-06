@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
-#define BUFFER_SIZE 50 //tamanho maximo do lista_pronta
 
 // implementação de fila de threads
 typedef struct node{
@@ -78,9 +77,8 @@ void *escalonador(void *ar){    //consome da fila e executa as threads
         while(lista_pronto->size==0){
             pthread_cond_wait(&fill,&buf);    //sem thread para executar
         }
-        Thread t = dequeue(lista_pronto);
-        if(lista_pronto->size==BUFFER_SIZE-1) pthread_cond_signal(&empty); 
-        pthread_mutex_unlock(&buf);
+        Thread t = dequeue(lista_pronto);    //mutex para alterar a lista
+        pthread_mutex_unlock(&buf); 
 
 
         pthread_mutex_lock(&mutexEsc);
@@ -138,11 +136,8 @@ int main(){
         pthread_cond_init(&cond[i], NULL); 
         pthread_create(&threads[i], NULL, thread_func, (void *) taskids[i]);
         pthread_mutex_lock(&buf);
-        while(lista_pronto->size==BUFFER_SIZE){
-            pthread_cond_wait(&empty, &buf);
-        }
         enqueue(lista_pronto, threads[i], i);
-        if(lista_pronto->size==1)   pthread_cond_signal(&fill);
+        if(lista_pronto->size==1)   pthread_cond_signal(&fill);    //acordando o escalonador já que há algo na lista
         pthread_mutex_unlock(&buf);
         ready[i] = 0;
     }
