@@ -1,1 +1,0 @@
-1. Desenvolva um programa que conte a ocorrência de uma palavra específica em X arquivos de texto. O programa deve usar threads, onde cada thread é responsável por buscar a palavra em um arquivo diferente. Use mutexes para atualizar um contador global de forma segura. O programa deve imprimir o total de ocorrências da palavra em todos os arquivos.
