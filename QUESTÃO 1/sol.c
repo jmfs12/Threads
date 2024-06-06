@@ -29,6 +29,7 @@ void *read(void *threadid);
 
 int main(){
     // leitura da palavra e do número de arquivos
+    printf("Sugestão de palavra: Recife e 2 arquivos\n");
     printf("Digite a palavra: ");
     scanf(" %s", word);
     printf("\nDigite o número de arquivos: ");
